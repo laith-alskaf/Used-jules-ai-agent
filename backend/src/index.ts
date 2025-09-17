@@ -8,6 +8,9 @@ import i18nextMiddleware from 'i18next-http-middleware';
 import authRoutes from './routes/auth.routes';
 import vehicleRoutes from './routes/vehicle.routes';
 import propertyRoutes from './routes/property.routes';
+import customerRoutes from './routes/customer.routes';
+import inquiryRoutes from './routes/inquiry.routes';
+import appointmentRoutes from './routes/appointment.routes';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './swagger';
 import logger from './logger';
@@ -35,6 +38,9 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/vehicles', vehicleRoutes);
 app.use('/api/properties', propertyRoutes);
+app.use('/api/customers', customerRoutes);
+app.use('/api/inquiries', inquiryRoutes);
+app.use('/api/appointments', appointmentRoutes);
 
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
