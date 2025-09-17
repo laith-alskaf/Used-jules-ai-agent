@@ -19,8 +19,11 @@ export class VehicleController {
 
   getAll = async (req: Request, res: Response): Promise<void> => {
     try {
-      const vehicles = await this.vehicleService.getAllVehicles();
-      res.status(200).json(vehicles);
+      const page = parseInt(req.query.page as string, 10) || 1;
+      const limit = parseInt(req.query.limit as string, 10) || 10;
+
+      const result = await this.vehicleService.getAllVehicles(page, limit);
+      res.status(200).json(result);
     } catch (error) {
       res.status(500).json({ message: 'Error getting vehicles', error });
     }

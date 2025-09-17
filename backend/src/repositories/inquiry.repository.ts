@@ -7,14 +7,20 @@ export class InquiryRepository {
     return prisma.inquiry.create({ data });
   }
 
-  async findAll(): Promise<Inquiry[]> {
+  async findAll(skip: number, take: number): Promise<Inquiry[]> {
     return prisma.inquiry.findMany({
+      skip,
+      take,
       include: {
         customer: true,
         vehicle: true,
         property: true,
       },
     });
+  }
+
+  async countAll(): Promise<number> {
+    return prisma.inquiry.count();
   }
 
   async findById(id: number): Promise<Inquiry | null> {

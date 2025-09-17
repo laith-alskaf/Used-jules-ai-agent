@@ -7,8 +7,15 @@ export class VehicleRepository {
     return prisma.vehicle.create({ data });
   }
 
-  async findAll(): Promise<Vehicle[]> {
-    return prisma.vehicle.findMany();
+  async findAll(skip: number, take: number): Promise<Vehicle[]> {
+    return prisma.vehicle.findMany({
+      skip,
+      take,
+    });
+  }
+
+  async countAll(): Promise<number> {
+    return prisma.vehicle.count();
   }
 
   async findById(id: number): Promise<Vehicle | null> {

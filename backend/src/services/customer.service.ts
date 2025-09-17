@@ -12,8 +12,20 @@ export class CustomerService {
     return this.customerRepository.create(data);
   }
 
-  async getAllCustomers(): Promise<Customer[]> {
-    return this.customerRepository.findAll();
+  async getAllCustomers(page: number, limit: number) {
+    const skip = (page - 1) * limit;
+    const take = limit;
+
+    const customers = await this.customerRepository.findAll(skip, take);
+    const totalCustomers = await this.customerRepository.countAll();
+
+    return {
+      data: customers,
+      total: totalCustomers,
+      page,
+      limit,
+      totalPages: Math.ceil(totalCustomers / limit),
+    };
   }
 
   async getCustomerById(id: number): Promise<Customer | null> {

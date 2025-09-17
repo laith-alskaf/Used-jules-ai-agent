@@ -19,8 +19,11 @@ export class AppointmentController {
 
   getAll = async (req: Request, res: Response): Promise<void> => {
     try {
-      const appointments = await this.appointmentService.getAllAppointments();
-      res.status(200).json(appointments);
+      const page = parseInt(req.query.page as string, 10) || 1;
+      const limit = parseInt(req.query.limit as string, 10) || 10;
+
+      const result = await this.appointmentService.getAllAppointments(page, limit);
+      res.status(200).json(result);
     } catch (error) {
       res.status(500).json({ message: 'Error getting appointments', error });
     }

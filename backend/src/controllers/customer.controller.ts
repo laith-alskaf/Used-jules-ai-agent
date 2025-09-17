@@ -19,8 +19,11 @@ export class CustomerController {
 
   getAll = async (req: Request, res: Response): Promise<void> => {
     try {
-      const customers = await this.customerService.getAllCustomers();
-      res.status(200).json(customers);
+      const page = parseInt(req.query.page as string, 10) || 1;
+      const limit = parseInt(req.query.limit as string, 10) || 10;
+
+      const result = await this.customerService.getAllCustomers(page, limit);
+      res.status(200).json(result);
     } catch (error) {
       res.status(500).json({ message: 'Error getting customers', error });
     }

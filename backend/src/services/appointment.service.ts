@@ -12,8 +12,20 @@ export class AppointmentService {
     return this.appointmentRepository.create(data);
   }
 
-  async getAllAppointments(): Promise<Appointment[]> {
-    return this.appointmentRepository.findAll();
+  async getAllAppointments(page: number, limit: number) {
+    const skip = (page - 1) * limit;
+    const take = limit;
+
+    const appointments = await this.appointmentRepository.findAll(skip, take);
+    const totalAppointments = await this.appointmentRepository.countAll();
+
+    return {
+      data: appointments,
+      total: totalAppointments,
+      page,
+      limit,
+      totalPages: Math.ceil(totalAppointments / limit),
+    };
   }
 
   async getAppointmentById(id: number): Promise<Appointment | null> {

@@ -5,6 +5,7 @@ import express from 'express';
 import morgan from 'morgan';
 import i18next from './i18n';
 import i18nextMiddleware from 'i18next-http-middleware';
+import rateLimit from 'express-rate-limit';
 import authRoutes from './routes/auth.routes';
 import vehicleRoutes from './routes/vehicle.routes';
 import propertyRoutes from './routes/property.routes';
@@ -20,6 +21,16 @@ import { CronService } from './services/cron.service';
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+// Rate limiting middleware
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+app.use(limiter);
+
 
 // i18next middleware
 app.use(i18nextMiddleware.handle(i18next));

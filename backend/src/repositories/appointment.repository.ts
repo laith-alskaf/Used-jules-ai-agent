@@ -7,12 +7,18 @@ export class AppointmentRepository {
     return prisma.appointment.create({ data });
   }
 
-  async findAll(): Promise<Appointment[]> {
+  async findAll(skip: number, take: number): Promise<Appointment[]> {
     return prisma.appointment.findMany({
+      skip,
+      take,
       include: {
         inquiry: true,
       },
     });
+  }
+
+  async countAll(): Promise<number> {
+    return prisma.appointment.count();
   }
 
   async findById(id: number): Promise<Appointment | null> {

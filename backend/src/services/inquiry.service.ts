@@ -29,8 +29,20 @@ export class InquiryService {
     return newInquiry;
   }
 
-  async getAllInquiries(): Promise<Inquiry[]> {
-    return this.inquiryRepository.findAll();
+  async getAllInquiries(page: number, limit: number) {
+    const skip = (page - 1) * limit;
+    const take = limit;
+
+    const inquiries = await this.inquiryRepository.findAll(skip, take);
+    const totalInquiries = await this.inquiryRepository.countAll();
+
+    return {
+      data: inquiries,
+      total: totalInquiries,
+      page,
+      limit,
+      totalPages: Math.ceil(totalInquiries / limit),
+    };
   }
 
   async getInquiryById(id: number): Promise<Inquiry | null> {

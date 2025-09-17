@@ -12,8 +12,20 @@ export class VehicleService {
     return this.vehicleRepository.create(data);
   }
 
-  async getAllVehicles(): Promise<Vehicle[]> {
-    return this.vehicleRepository.findAll();
+  async getAllVehicles(page: number, limit: number) {
+    const skip = (page - 1) * limit;
+    const take = limit;
+
+    const vehicles = await this.vehicleRepository.findAll(skip, take);
+    const totalVehicles = await this.vehicleRepository.countAll();
+
+    return {
+      data: vehicles,
+      total: totalVehicles,
+      page,
+      limit,
+      totalPages: Math.ceil(totalVehicles / limit),
+    };
   }
 
   async getVehicleById(id: number): Promise<Vehicle | null> {

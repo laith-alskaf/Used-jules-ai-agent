@@ -7,8 +7,15 @@ export class CustomerRepository {
     return prisma.customer.create({ data });
   }
 
-  async findAll(): Promise<Customer[]> {
-    return prisma.customer.findMany();
+  async findAll(skip: number, take: number): Promise<Customer[]> {
+    return prisma.customer.findMany({
+      skip,
+      take,
+    });
+  }
+
+  async countAll(): Promise<number> {
+    return prisma.customer.count();
   }
 
   async findById(id: number): Promise<Customer | null> {
