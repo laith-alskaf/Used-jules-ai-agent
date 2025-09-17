@@ -16,6 +16,7 @@ import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './swagger';
 import logger from './logger';
 import errorHandler from './middleware/errorHandler';
+import { CronService } from './services/cron.service';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -53,4 +54,8 @@ app.use(errorHandler);
 app.listen(port, () => {
   logger.info(`Server is running on http://localhost:${port}`);
   logger.info(`API documentation available at http://localhost:${port}/api-docs`);
+
+  // Start cron jobs
+  const cronService = new CronService();
+  cronService.start();
 });

@@ -1,15 +1,32 @@
 import { InquiryRepository } from '../repositories/inquiry.repository';
 import { Inquiry, Prisma } from '@prisma/client';
+import { EmailService } from './email.service';
+import logger from './logger';
 
 export class InquiryService {
   private inquiryRepository: InquiryRepository;
+  private emailService: EmailService;
 
   constructor() {
     this.inquiryRepository = new InquiryRepository();
+    this.emailService = new EmailService();
   }
 
   async createInquiry(data: Prisma.InquiryCreateInput): Promise<Inquiry> {
-    return this.inquiryRepository.create(data);
+    const newInquiry = await this.inquiryRepository.create(data);
+
+    // Send notification email
+    const recipientEmail = process.env.BUSINESS_OWNER_EMAIL;
+    if (recipientEmail) {
+      this.emailService.sendNewInquiryAlert(newInquiry, recipientEmail).catch(error => {
+        // Log the error but don't block the main response
+        logger.error('Failed to send new inquiry email:', error);
+      });
+    } else {
+      logger.warn('BUSINESS_OWNER_EMAIL not set. Skipping new inquiry notification.');
+    }
+
+    return newInquiry;
   }
 
   async getAllInquiries(): Promise<Inquiry[]> {
