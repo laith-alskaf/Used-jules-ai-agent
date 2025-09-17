@@ -11,6 +11,7 @@ import propertyRoutes from './routes/property.routes';
 import customerRoutes from './routes/customer.routes';
 import inquiryRoutes from './routes/inquiry.routes';
 import appointmentRoutes from './routes/appointment.routes';
+import reportingRoutes from './routes/reporting.routes';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './swagger';
 import logger from './logger';
@@ -41,6 +42,7 @@ app.use('/api/properties', propertyRoutes);
 app.use('/api/customers', customerRoutes);
 app.use('/api/inquiries', inquiryRoutes);
 app.use('/api/appointments', appointmentRoutes);
+app.use('/api/reports', reportingRoutes);
 
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
