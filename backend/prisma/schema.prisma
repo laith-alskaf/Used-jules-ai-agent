@@ -1,81 +1,111 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-generator client {
-  provider = "prisma-client-js"
-}
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String
-  name      String?
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Tenant {
+  id        String   @id @default(cuid())
+  name      String
+  currency  String   @default("USD")
+  timezone  String   @default("UTC")
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+
+  users         User[]
+  products      Product[]
+  customers     Customer[]
+  invoices      Invoice[]
+  transactions  Transaction[]
+  subscriptions Subscription[]
 }
 
-model Vehicle {
-  id          Int      @id @default(autoincrement())
-  make        String
-  model       String
-  year        Int
-  price       Float
-  features    String[]
-  images      String[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  inquiries   Inquiry[]
+model User {
+  id           String   @id @default(cuid())
+  tenantId     String
+  name         String?
+  email        String   @unique
+  passwordHash String
+  role         String   @default("user")
+  createdAt    DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
 }
 
-model Property {
-  id          Int      @id @default(autoincrement())
-  type        String
-  location    String
-  size        Float
+model Product {
+  id          String   @id @default(cuid())
+  tenantId    String
+  sku         String
+  name        String
   price       Float
-  amenities   String[]
-  images      String[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  inquiries   Inquiry[]
+  stockQty    Int
+  reorderLevel Int
+
+  tenant      Tenant        @relation(fields: [tenantId], references: [id])
+  invoiceItems InvoiceItem[]
+
+  @@unique([tenantId, sku])
 }
 
 model Customer {
-  id          Int      @id @default(autoincrement())
-  name        String
-  phone       String   @unique
-  email       String?  @unique
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  inquiries   Inquiry[]
+  id      String   @id @default(cuid())
+  tenantId String
+  name    String
+  phone   String?
+  email   String   @unique
+  address String?
+
+  tenant   Tenant    @relation(fields: [tenantId], references: [id])
+  invoices Invoice[]
 }
 
-model Inquiry {
-  id          Int      @id @default(autoincrement())
-  customerId  Int
-  customer    Customer @relation(fields: [customerId], references: [id])
-  vehicleId   Int?
-  vehicle     Vehicle? @relation(fields: [vehicleId], references: [id])
-  propertyId  Int?
-  property    Property? @relation(fields: [propertyId], references: [id])
-  status      String   // new, contacted, scheduled, visited, converted, lost
-  notes       String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  appointments Appointment[]
+model Invoice {
+  id         String   @id @default(cuid())
+  tenantId   String
+  number     String
+  type       String
+  customerId String
+  total      Float
+  status     String
+  createdAt  DateTime @default(now())
+
+  tenant   Tenant        @relation(fields: [tenantId], references: [id])
+  customer Customer      @relation(fields: [customerId], references: [id])
+  items    InvoiceItem[]
 }
 
-model Appointment {
-  id          Int      @id @default(autoincrement())
-  inquiryId   Int
-  inquiry     Inquiry  @relation(fields: [inquiryId], references: [id])
-  date        DateTime
-  notes       String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model InvoiceItem {
+  id        String @id @default(cuid())
+  invoiceId String
+  productId String
+  qty       Int
+  unitPrice Float
+  lineTotal Float
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model Transaction {
+  id        String   @id @default(cuid())
+  tenantId  String
+  refType   String
+  refId     String
+  amount    Float
+  createdAt DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+}
+
+model Subscription {
+  id        String   @id @default(cuid())
+  tenantId  String
+  plan      String
+  status    String
+  startedAt DateTime
+  expiresAt DateTime?
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
 }
